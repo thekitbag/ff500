@@ -1,0 +1,29 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Points</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in data['team']%}
+            {% if i['minutes'] == True %}
+            <tr class="primary">
+            {% elif i['minutes'] == False %}}
+            <tr class="danger">
+            {% else %}
+            <tr class="secondary">
+            {% endif %}
+
+            {% if i['is_captain'] == True %}
+            <th scope="row">{{i['name']}} (c)</th>
+            {% elif i['is_vice_captain'] == True %}
+            <td>{{i['name']}} (vc)</td>
+            {% else %}
+            <td>{{i['name']}}</td>
+            {% endif %}
+            <td>0</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>

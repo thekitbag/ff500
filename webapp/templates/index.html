@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <div class="container">
+        <img src="../static/sad_Scott.jpg" alt="Sad Scott" height="300" width="300"> 
+        {% if current_user.is_authenticated %}
+        <h1>Hi {{current_user.username}} </h1>
+        <h1>Your score so far this week: {{ data['score'] }} </h1>
+        {% endif %}
+        <h1>Transfer deadline: {{moment(data['deadline']).calendar()}}</h1>
+        <h1>Draft deadline: {{moment(data['draft deadline']).calendar()}}</h1>
+        <br>
+        <h1>Live Points: 69</h1>
+    </div>
+        {% include '_team.html' %}
+{% endblock %}

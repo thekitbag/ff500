@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+
+{% block app_content %}
+<script src='static/Chart.min.js'></script>
+<div class="container">
+	<h1>History</h1>
+	{% if league_data['standings'] == [''] %}
+	<h3> This League is still Registering</h3>
+		<table class="table">
+	    <thead>
+	        <tr>
+	            <th>Entrant</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    	{% for i in league_data['members'] %}
+	        	<tr class="primary">
+	        		<td>{{i}}</td>
+	        	</tr>	
+	        {% endfor %}
+	    </tbody>
+	    </table>
+	 {% else %}
+	<h1>Overall Rankings</h1>
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>FPL Points</th>
+            <th>League Points</th>
+            <th>Fines</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for i in league_data['leaderboard'] %}
+        <tr>
+            <td><a href="{{ url_for('user', username=i['player']) }}">{{i['player']}}</a></td>
+            <td>{{i['fpl_points']}}</td>
+            <td>{{i['league_points']}}</td>
+            <td>£{{i['fines']}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+	</table>
+    <h1>Graph</h1>
+    <!-- bar chart canvas element -->
+    {{legend}}
+    <div id="graph" width="90%" height="500px" margin-left="10%">
+    <canvas id="myChart" width="800px" height="500px"></canvas>
+    </div>
+    <br>
+<script>
+      // Global parameters:
+      // do not resize the chart canvas when its container does (keep at 600x400px)
+      Chart.defaults.global.responsive = false;
+      // define the chart data
+
+      var chartData = {
+        labels : {{league_data['graph'][0]['gameweeks']}},
+        datasets : [
+            {% for player in league_data['graph'] %}
+    
+        {
+            label: "{{player['player']}}",
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: "{{player['colour']}}",
+            borderColor: "{{player['colour']}}",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "{{player['colour']}}",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "{{player['colour']}}",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data : {{player['running_scores']}},
+            spanGaps: false
+        },
+        {% endfor %}
+        ]
+      }
+
+      // get chart canvas
+      var holder = document.getElementById("myChart");
+      var ctx = document.getElementById("myChart").getContext("2d");
+
+      // create the chart using the chart canvas
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          tooltips: {
+            enabled: true,
+            mode: 'single',
+            callbacks: {
+              label: function(tooltipItems, data) {
+                       return chartData["datasets"][tooltipItems.datasetIndex]["label"];
+                     }
+            }
+          },
+        }
+      });
+</script>
+
+<h1>Trivia</h1>
+
+<table class="table">
+    <thead>
+        <th>Player</th>
+        <th>Wins</th>
+        <th>In The Points</th>
+        <th>Negatives</th>
+        <th>Losses</th>
+        <th>MotMs</th>
+        <th>Bottom Two</th>
+    </thead>
+    <tbody>
+        {% for i in league_data['trivia'] %}
+        <tr>
+            <td>{{i}}</td>
+            <td>{{league_data['trivia'][i]['wins']}} ({{league_data['trivia'][i]['win_percentage']}}%)</td>
+            <td>{{league_data['trivia'][i]['points']}}</td>
+            <td>{{league_data['trivia'][i]['negatives']}}</td>
+            <td>{{league_data['trivia'][i]['losses']}} ({{league_data['trivia'][i]['loss_percentage']}}%)</td>
+            <td>{{league_data['trivia'][i]['motms']}}</td>
+            <td>{{league_data['trivia'][i]['bottom_two']}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% for i in league_data['monthly_standings'] %}
+<h3>{{i}}</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Player</th>
+            <th>Points</th>   
+        </tr>
+    </thead>
+    <tbody>
+        {% for j in league_data['monthly_standings'][i] %}
+            {% for k in j %}
+                {% if j == league_data['monthly_standings'][i][0]%}
+                <tr class="success">
+                {% elif j in league_data['monthly_standings'][i][-2:] %}
+                <tr class="danger">
+                {% endif %}
+        
+            <td>{{k}}</td>
+            <td>{{j[k]}}</td>
+        </tr>
+            {% endfor %}
+        {% endfor %} 
+    </tbody>
+</table>
+
+{% endfor %}
+    <h1>Gameweeks</h1>
+    <br>
+    {% for i in league_data['gameweeks'] %}
+    <h2>Game Week {{i}}</h2>
+
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>FPL Points</th>
+            <th>League Points</th>
+            <th>Fines</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+    	{% for j in league_data['gameweeks'][i] %}
+	        <tr>
+	        	<td>{{j['player']}}</td>
+	            <td>{{j['fpl_points']}}</td>
+	            <td>{{j['league_points']}}</td>
+	            <td>{{j['fines']}}</td>
+	            <td>{{j['notes']}}</td>
+	        </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    {% endfor %}
+    
+	 {% endif %}
+</div>
+
+{% endblock %}
