@@ -118,7 +118,6 @@ def leagues():
     return render_template('leagues.html', data=data)
 
 @app.route('/history/<league_id>')
-@login_required
 def history(league_id):
     league = League.query.filter_by(league_id=league_id).first_or_404()
     a = FF500League(league)
@@ -126,7 +125,6 @@ def history(league_id):
     return render_template('history.html', league_data=league_data)
 
 @app.route('/live')
-@login_required
 def live():
     return render_template('live.html')
 
