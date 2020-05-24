@@ -21,6 +21,7 @@ class FF500League(object):
 		if self.league.status != 'registering':
 			if self.league.status == 'starting':
 				self.addLeagueGameweeks()
+				self.buildMonthlyStandings()
 				self.addMonthlyFines()
 			self.buildMonthlyStandings()
 			self.buildLeaderboard() 
@@ -121,12 +122,16 @@ class FF500League(object):
 		for i in self.monthly_standings:
 			if i not in ['March', 'April','May']:
 				losers = self.monthly_standings[i]['losers']
+				print("FOO")
 				for j in league_calcs.fpl_phases:
 					if i == j['name']:
 						for loser in losers:
 							lgw = LeagueGameweek.query.filter_by(league_id = self.league.league_id, user=loser, fpl_event=j['stop_event']).first()
 							lgw.fines += 25
-							lgw.notes += ' finished in bottom 2'
+							if lgw.notes:
+								lgw.notes += ' & finished in bottom 2'
+							else:
+								lgw.notes = ' Finished in bottom 2'
 			db.session.commit()
 
 

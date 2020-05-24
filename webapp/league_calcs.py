@@ -28,7 +28,6 @@ def ff350_calc(league):
 		champ_points = assignChampionshipPoints(scores)
 		standings[week] = champ_points
 		for wk, points in standings.items():
-			print('point.items()', points.items())
 			for i,j in points.items():
 				league_gameweek = LeagueGameweek.query.filter_by(user=i, fpl_event=wk, league_id=league.league_id).first()
 				league_gameweek.championship_points = j
@@ -36,7 +35,9 @@ def ff350_calc(league):
 				if fpl_gw.chip:
 					if j == -2:
 						league_gameweek.fines += 20
-						league_gameweek.notes += ' Played chip and came last'
+						if league_gameweek.notes:
+							league_gameweek.notes += ' & Played chip and came last'
+						else: league_gameweek.notes = 'Played chip and came last'
 
 	league.status = 'running'
 	db.session.commit()
@@ -124,7 +125,7 @@ def calculateFines(fpl_gameweek):
 		fines += 20
 		reasons.append("Couldn't field 11 players")
 
-	joined_reasons = " ".join(reasons)
+	joined_reasons = " & ".join(reasons)
 	return {'fines': fines, 'reasons': joined_reasons}
 
 
