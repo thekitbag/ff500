@@ -93,12 +93,15 @@ class FF500League(object):
 	def createGraph(self):
 		"""takes gameweek data and puts in the right format for Chart.js"""
 		data = []
+		colours1 = [1,30, 60, 90, 120, 150, 180, 210]
+		colours2 = [1,30, 60, 90, 120, 150, 180, 210]
+		colours3 = [1,30, 60, 90, 120, 150, 180, 210]
 		for i in self.members:
 			x = "rgba(220,220,220,1)"
-			v1 = str(randint(1,220))
-			v2 = str(randint(1,220))
-			v3 = str(randint(1,220))
-			colour = f"rgba({v1},{v2},{v3},0.4)"
+			v1 = colours1.pop(randint(0,len(colours1)-1))
+			v2 = colours2.pop(randint(0,len(colours2)-1))
+			v3 = colours3.pop(randint(0,len(colours3)-1))
+			colour = f"rgba({v1},{v2},{v3},0.6)"
 			data.append({'player': i.username, 'running_scores': [], 'gameweeks': [], 'colour': colour})
 		for i in self.gameweeks:
 			data[0]['gameweeks'].append(i)
