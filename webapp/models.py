@@ -80,7 +80,6 @@ class League(db.Model):
 	status = db.Column(db.String(128))
 	members = db.relationship("Membership", back_populates="league")
 	league_gameweeks = db.relationship("LeagueGameweek", back_populates="league")
-
 	def __repr__(self):
 		return '<League {}>'.format(self.league_id)
 

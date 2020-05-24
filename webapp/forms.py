@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, BooleanField, SubmitField, 
-    TextAreaField, StringField, FloatField, SelectField)
+    TextAreaField, StringField, FloatField, SelectField, IntegerField)
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from webapp.models import User
 from webapp.api_calls import getTeamDetails
@@ -56,6 +56,7 @@ class EditProfileForm(FlaskForm):
 class CreateLeagueForm(FlaskForm):
     league_name = StringField('League Name', validators=[DataRequired()])
     entry_fee = FloatField('Entry Fee', validators=[DataRequired()])
+    max_entrants = IntegerField('Maximum Entrants', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
     def create_code(self):

@@ -28,8 +28,9 @@ def ff350_calc(league):
 		champ_points = assignChampionshipPoints(scores)
 		standings[week] = champ_points
 		for wk, points in standings.items():
+			print('point.items()', points.items())
 			for i,j in points.items():
-				league_gameweek = LeagueGameweek.query.filter_by(user=i, fpl_event=wk).first()
+				league_gameweek = LeagueGameweek.query.filter_by(user=i, fpl_event=wk, league_id=league.league_id).first()
 				league_gameweek.championship_points = j
 				fpl_gw = FPL_Gameweek.query.filter_by(user=i, fpl_event=wk).first()
 				if fpl_gw.chip:
@@ -40,10 +41,34 @@ def ff350_calc(league):
 	league.status = 'running'
 	db.session.commit()
 
+def createScoreTable(number_of_players):
+	if number_of_players == 2:
+		scores = [0,1]
+	elif number_of_players == 3:
+		scores = [-1,0,1]
+	elif number_of_players == 4:
+		scores = [-1,0,1,2]
+	elif number_of_players == 5:
+		scores = [-1,0,0,1,2]
+	elif 11 > number_of_players > 5:
+		scores = [-2,-1]
+		for i in range(number_of_players - 5):
+			scores.append(0)
+		for i in range(1,4):
+			scores.append(i)
+	elif number_of_players > 10:
+		scores = [-3,-2,-1]
+		for i in range(number_of_players - 8):
+			scores.append(0)
+		for i in range(1,6):
+			scores.append(i)
+	return scores
+
 def assignChampionshipPoints(scores):
 	"""takes a scores dictionary and assigns points"""
+	number_of_players = len(scores)
+	score_points = createScoreTable(number_of_players)
 	champ_points = {}
-	score_points = [-2,-1,0,0,1,2,3]
 	sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 	res = []
 	prev = None
@@ -51,15 +76,9 @@ def assignChampionshipPoints(scores):
 		if v!=prev:
 			place,prev = i+1,v
 		res.append((k,place))
-	positions = [
-	[],
-	[],
-	[],
-	[],
-	[],
-	[],
-	[]
-	]
+	positions = []
+	for i in range(number_of_players):
+		positions.append([])
 	for tup in res:
 		positions[tup[1]-1].append(tup[0])
 	for lst in positions:

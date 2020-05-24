@@ -31,7 +31,8 @@
                     <li><a href="{{ url_for('register') }}">Register</a></li>
                     {% else %}
                     <li><a href="{{ url_for('live') }}">Live</a></li>
-                    <li><a href="{{ url_for('history') }}">History</a></li>
+                    <li><a href="{{ url_for('leagues') }}">Leagues</a></li>
+                    <li><a href="{{ url_for('create_league') }}">Create League</a></li>
                     <li><a href="{{ url_for('join_league') }}">Join League</a></li>
                     <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>

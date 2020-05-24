@@ -52,6 +52,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(a[7].is_captain, 1)
         self.assertEqual(a[0].user, u)
 
+"""commenting out as this takes a while to run
 class GameweekPerformanceModelCase(unittest.TestCase):
     def test_buildGameweekPerformanceTable(self):
         Player.buildPlayerTable()
@@ -66,7 +67,14 @@ class GameweekPerformanceModelCase(unittest.TestCase):
         c = Player.query.filter_by(name='Maitland-Niles').first()
         c_gameweeks = c.gameweek_performances
         self.assertEqual(c_gameweeks[5].red_cards, 1)
-    
+"""
+
+class FineModelCase(unittest.TestCase):
+    f= Fine(name='red card', description='any player gets a red')
+    l = League(league_id=1, league_name='ff500')
+    l.fines.append(f)
+    self.assertEqual(l.fines, 93)
+
 
 
 

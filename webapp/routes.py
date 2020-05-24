@@ -77,7 +77,7 @@ def register():
 @login_required
 def user(username):
     #duplication of this code on index - turn in to separate function and reuse
-    current_week = api_calls.getNextWeekDetails()
+    current_week = api_calls.getCurrentWeekDetails()
     week_id = current_week['id']
     data = {}
     user = User.query.filter_by(username=username).first_or_404()
@@ -105,11 +105,22 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
-@app.route('/history')
+@app.route('/leagues')
 @login_required
-def history():
-    league_name = 'ff500'
-    league = League.query.filter_by(league_name=league_name).first_or_404()
+def leagues():
+    memberships = current_user.memberships
+    leagues = []
+    for membership in memberships:
+        leagues.append(membership.league)
+    data = []
+    for league in leagues:
+        data.append({'league_name':league.league_name, 'id':league.league_id})
+    return render_template('leagues.html', data=data)
+
+@app.route('/history/<league_id>')
+@login_required
+def history(league_id):
+    league = League.query.filter_by(league_id=league_id).first_or_404()
     a = FF500League(league)
     league_data = a.leagueDataJson()
     return render_template('history.html', league_data=league_data)
@@ -126,7 +137,7 @@ def create_league():
     code = form.create_code()
     if form.validate_on_submit():
         league = League(league_name=form.league_name.data, entry_fee=form.entry_fee.data, 
-                        payout_rules='ff350', entrants=7, entry_code=code, status='registering')
+                        payout_rules='ff350', entrants=form.max_entrants.data, entry_code=code, status='registering')
         db.session.add(league)
         current_user.joinLeague(league)
         message = f"Congratulations, you have created league: {league.league_name}! Give code: {code} \
@@ -145,6 +156,11 @@ def join_league():
             message = "No league with this code exists"
             flash(message)
             return redirect(url_for('join_league'))
+        elif league.status != 'registering':
+             message = "This league is no longer open for registration"
+             flash(message)
+             return redirect(url_for('join_league'))
+
         else: current_user.joinLeague(league)
         if len(league.members) == league.entrants:
             league.status = 'starting'
